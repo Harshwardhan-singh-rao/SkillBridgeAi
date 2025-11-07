@@ -42,7 +42,7 @@ export function IndustryDemand() {
                   cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
                   content={<ChartTooltipContent indicator="dot" />}
                 />
-                <Bar dataKey="demand" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="demand" fill="var(--color-demand)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
           </div>
