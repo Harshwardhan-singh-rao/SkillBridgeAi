@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { ScrollToTop } from '@/components/ui/scroll-to-top';
 import CursorGlow from '@/components/ui/cursor-glow';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
@@ -34,12 +35,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${ptSans.variable} ${spaceGrotesk.variable} font-body antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <CursorGlow />
-          <Header />
-          <main>{children}</main>
-          <Footer />
-          <Toaster />
-          <ScrollToTop />
+          <FirebaseClientProvider>
+            <CursorGlow />
+            <Header />
+            <main>{children}</main>
+            <Footer />
+            <Toaster />
+            <ScrollToTop />
+          </FirebaseClientProvider>
         </ThemeProvider>
       </body>
     </html>
