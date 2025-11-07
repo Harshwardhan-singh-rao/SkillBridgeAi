@@ -1,44 +1,25 @@
 'use client';
 
-import {useEffect, useState} from 'react';
-import {Auth} from 'firebase/auth';
-import {FirebaseApp} from 'firebase/app';
-import {Firestore} from 'firebase/firestore';
+import React, { useMemo, type ReactNode } from 'react';
+import { FirebaseProvider } from '@/firebase/provider';
+import { initializeFirebase } from '@/firebase';
 
-import {FirebaseProvider} from '@/firebase/provider';
-import {initializeFirebase} from '@/firebase';
+interface FirebaseClientProviderProps {
+  children: ReactNode;
+}
 
-// NOTE: This is a client-only provider that will not be rendered on the server.
-// It is used to initialize Firebase on the client-side and provide the
-// Firebase context to its children.
-export function FirebaseClientProvider({children}: {children: React.ReactNode}) {
-  const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | null>(null);
-  const [firestore, setFirestore] = useState<Firestore | null>(null);
-  const [auth, setAuth] = useState<Auth | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // We are only initializing Firebase on the client-side.
-    // This is to prevent any server-side rendering issues.
-    // The `initializeFirebase` function is responsible for creating a new
-    // Firebase app instance and returning the app, firestore, and auth.
-    // The `initializeFirebase` function is idempotent, so it will only
-    // initialize the app once.
-    const {app, firestore, auth} = initializeFirebase();
-    setFirebaseApp(app);
-    setFirestore(firestore);
-    setAuth(auth);
-    setLoading(false);
-  }, []);
-
-  if (loading) {
-    // You can return a loading spinner or some placeholder here.
-    // Returning null will prevent rendering children until Firebase is initialized.
-    return null;
-  }
+export function FirebaseClientProvider({ children }: FirebaseClientProviderProps) {
+  const firebaseServices = useMemo(() => {
+    // Initialize Firebase on the client side, once per component mount.
+    return initializeFirebase();
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   return (
-    <FirebaseProvider app={firebaseApp} firestore={firestore} auth={auth}>
+    <FirebaseProvider
+      firebaseApp={firebaseServices.firebaseApp}
+      auth={firebaseServices.auth}
+      firestore={firebaseServices.firestore}
+    >
       {children}
     </FirebaseProvider>
   );
