@@ -27,7 +27,7 @@ import { Skeleton } from "../ui/skeleton"
 const navLinks = [
   { href: "/#problem", label: "The Problem" },
   { href: "/#how-it-works", label: "How It Works" },
-  { href: "/#features", label: "Features" },
+  { href="/#features", label: "Features" },
   { href: "/#mentors", label: "Mentors" },
   { href: "/#testimonials", label: "Testimonials" },
 ]
@@ -140,9 +140,12 @@ export function Header() {
                 {isUserLoading ? (
                   <Skeleton className="h-10 w-full" />
                 ) : user && !user.isAnonymous ? (
-                  <Button asChild>
-                    <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>Go to Dashboard</Link>
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button asChild>
+                      <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>Go to Dashboard</Link>
+                    </Button>
+                     <Button variant="outline" onClick={() => { handleSignOut(); setIsMenuOpen(false); }}>Sign Out</Button>
+                  </div>
                 ) : (
                   <Button asChild>
                     <Link href="/auth" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
