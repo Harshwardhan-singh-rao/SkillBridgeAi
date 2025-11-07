@@ -62,6 +62,7 @@ export default function AuthPage() {
   });
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
+    if (!auth) return;
     setIsSubmitting(true);
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
@@ -78,6 +79,7 @@ export default function AuthPage() {
   };
 
   const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
+    if (!auth) return;
     setIsSubmitting(true);
     try {
       await createUserWithEmailAndPassword(auth, values.email, values.password);
@@ -94,6 +96,7 @@ export default function AuthPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);

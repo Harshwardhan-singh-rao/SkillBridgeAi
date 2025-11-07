@@ -11,7 +11,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { useUser } from "@/firebase/auth/use-user"
+import { useUser } from "@/firebase"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { signOut } from "firebase/auth"
 import { useAuth } from "@/firebase"
+import { Skeleton } from "../ui/skeleton"
 
 const navLinks = [
   { href: "/#problem", label: "The Problem" },
@@ -32,7 +33,7 @@ const navLinks = [
 ]
 
 export function Header() {
-  const { user, loading } = useUser();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,8 +49,43 @@ export function Header() {
   }, [])
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    if (auth) {
+      await signOut(auth);
+    }
   };
+
+  const renderAuthContent = () => {
+    if (isUserLoading) {
+      return <Skeleton className="h-10 w-24" />;
+    }
+
+    if (user && !user.isAnonymous) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary" size="icon" className="rounded-full">
+              <User className="h-5 w-5" />
+              <span className="sr-only">Toggle user menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild><Link href="/dashboard">Dashboard</Link></DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
+
+    return (
+      <Button asChild>
+        <Link href="/auth">Get Started</Link>
+      </Button>
+    )
+  }
 
   return (
     <header
@@ -74,28 +110,7 @@ export function Header() {
         </nav>
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          {!loading && user ? (
-             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="icon" className="rounded-full">
-                  <User className="h-5 w-5" />
-                  <span className="sr-only">Toggle user menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Link href="/dashboard">Dashboard</Link></DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button asChild>
-              <Link href="/auth">Get Started</Link>
-            </Button>
-          )}
+          {renderAuthContent()}
         </div>
         <div className="md:hidden">
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -122,9 +137,17 @@ export function Header() {
                     <span>Switch Theme</span>
                     <ThemeToggle />
                   </div>
-                <Button asChild>
-                  <Link href="/auth" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
-                </Button>
+                {isUserLoading ? (
+                  <Skeleton className="h-10 w-full" />
+                ) : user && !user.isAnonymous ? (
+                  <Button asChild>
+                    <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>Go to Dashboard</Link>
+                  </Button>
+                ) : (
+                  <Button asChild>
+                    <Link href="/auth" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                  </Button>
+                )}
               </div>
             </SheetContent>
           </Sheet>
