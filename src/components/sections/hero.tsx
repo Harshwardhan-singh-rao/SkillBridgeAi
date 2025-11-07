@@ -27,7 +27,7 @@ export function Hero() {
             </p>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Button asChild size="lg">
-                <Link href="#signup">Get Started</Link>
+                <Link href="/auth">Get Started</Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
                 <Link href="#features">Explore Features</Link>

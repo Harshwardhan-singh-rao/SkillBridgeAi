@@ -5,24 +5,36 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { ThemeToggle } from "../ui/theme-toggle"
-import { BrainCircuit } from "lucide-react"
+import { BrainCircuit, Menu, User } from "lucide-react"
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { Menu } from "lucide-react"
+import { useUser } from "@/firebase/auth/use-user"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { signOut } from "firebase/auth"
+import { useAuth } from "@/firebase"
 
 const navLinks = [
-  { href: "#problem", label: "The Problem" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#features", label: "Features" },
-  { href: "#mentors", label: "Mentors" },
-  { href: "#testimonials", label: "Testimonials" },
+  { href: "/#problem", label: "The Problem" },
+  { href: "/#how-it-works", label: "How It Works" },
+  { href: "/#features", label: "Features" },
+  { href: "/#mentors", label: "Mentors" },
+  { href: "/#testimonials", label: "Testimonials" },
 ]
 
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
+  const { user, loading } = useUser();
+  const auth = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -34,6 +46,10 @@ export function Header() {
       window.removeEventListener("scroll", handleScroll)
     }
   }, [])
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+  };
 
   return (
     <header
@@ -58,9 +74,28 @@ export function Header() {
         </nav>
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          <Button asChild>
-            <Link href="#signup">Get Started</Link>
-          </Button>
+          {!loading && user ? (
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon" className="rounded-full">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild><Link href="/dashboard">Dashboard</Link></DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button asChild>
+              <Link href="/auth">Get Started</Link>
+            </Button>
+          )}
         </div>
         <div className="md:hidden">
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -88,7 +123,7 @@ export function Header() {
                     <ThemeToggle />
                   </div>
                 <Button asChild>
-                  <Link href="#signup" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                  <Link href="/auth" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
                 </Button>
               </div>
             </SheetContent>

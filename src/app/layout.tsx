@@ -38,7 +38,7 @@ export default function RootLayout({
           <FirebaseClientProvider>
             <CursorGlow />
             <Header />
-            <main>{children}</main>
+            <main className="pt-16">{children}</main>
             <Footer />
             <Toaster />
             <ScrollToTop />

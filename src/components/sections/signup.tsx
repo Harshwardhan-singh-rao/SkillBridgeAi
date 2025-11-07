@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import Link from "next/link"
 
 const FormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -50,7 +51,7 @@ export function Signup() {
 
   return (
     <>
-      <section id="signup" className="relative w-full overflow-hidden">
+      <section id="signup" className="relative w-full overflow-hidden py-12 md:py-24 lg:py-32">
         <div className="absolute inset-0 bg-background animated-gradient -z-10"></div>
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -90,7 +91,9 @@ export function Signup() {
                       <Button type="submit" size="lg" disabled={isSubmitting}>
                         {isSubmitting ? "Analyzing..." : "Get My Personalized Path"}
                       </Button>
-                      <Button variant="outline" size="lg" className="bg-background/80">Sign up with Google</Button>
+                      <Button asChild variant="outline" size="lg" className="bg-background/80">
+                        <Link href="/auth">Sign up with Google</Link>
+                      </Button>
                     </div>
                   </form>
                 </Form>
