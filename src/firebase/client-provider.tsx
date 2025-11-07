@@ -1,9 +1,9 @@
 'use client';
 
 import {useEffect, useState} from 'react';
-import {Auth, getAuth} from 'firebase/auth';
+import {Auth} from 'firebase/auth';
 import {FirebaseApp} from 'firebase/app';
-import {Firestore, getFirestore} from 'firebase/firestore';
+import {Firestore} from 'firebase/firestore';
 
 import {FirebaseProvider} from '@/firebase/provider';
 import {initializeFirebase} from '@/firebase';
@@ -15,6 +15,7 @@ export function FirebaseClientProvider({children}: {children: React.ReactNode}) 
   const [firebaseApp, setFirebaseApp] = useState<FirebaseApp | null>(null);
   const [firestore, setFirestore] = useState<Firestore | null>(null);
   const [auth, setAuth] = useState<Auth | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // We are only initializing Firebase on the client-side.
@@ -27,7 +28,14 @@ export function FirebaseClientProvider({children}: {children: React.ReactNode}) 
     setFirebaseApp(app);
     setFirestore(firestore);
     setAuth(auth);
+    setLoading(false);
   }, []);
+
+  if (loading) {
+    // You can return a loading spinner or some placeholder here.
+    // Returning null will prevent rendering children until Firebase is initialized.
+    return null;
+  }
 
   return (
     <FirebaseProvider app={firebaseApp} firestore={firestore} auth={auth}>
