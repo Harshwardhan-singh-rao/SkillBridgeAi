@@ -3,7 +3,7 @@
 import {useEffect, useState} from 'react';
 import {User, onAuthStateChanged} from 'firebase/auth';
 
-import {useAuth} from '@/firebase/provider';
+import {useAuth} from '@/firebase';
 
 export function useUser() {
   const auth = useAuth();
