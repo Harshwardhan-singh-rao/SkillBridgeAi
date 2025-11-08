@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { ThemeToggle } from "../ui/theme-toggle"
@@ -27,7 +28,7 @@ import { Skeleton } from "../ui/skeleton"
 const navLinks = [
   { href: "/#problem", label: "The Problem" },
   { href: "/#how-it-works", label: "How It Works" },
-  { href="/#features", label: "Features" },
+  { href: "/#features", label: "Features" },
   { href: "/#mentors", label: "Mentors" },
   { href: "/#testimonials", label: "Testimonials" },
 ]
@@ -35,6 +36,7 @@ const navLinks = [
 export function Header() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -51,6 +53,7 @@ export function Header() {
   const handleSignOut = async () => {
     if (auth) {
       await signOut(auth);
+      router.replace("/");
     }
   };
 

@@ -19,7 +19,9 @@ export async function aiInteractiveCareerCoach(
     return result;
   } catch (error) {
     console.error("Error in aiInteractiveCareerCoach:", error);
-    return { answer: "Sorry, I encountered an error. Please try again." };
+    const msg = error instanceof Error ? error.message : String(error);
+    // Provide a friendly, actionable message without leaking secrets
+    return { answer: `AI is temporarily unavailable. Please try again in a moment. If this persists, ensure GOOGLE_API_KEY is set and your network allows outgoing requests. Details: ${msg}` };
   }
 }
 
@@ -31,10 +33,10 @@ export async function analyzeSkillGaps(
     return result;
   } catch (error) {
     console.error("Error in analyzeSkillGaps:", error);
-    // Return a structured error response
+    // Return empty arrays so UI can hide these sections gracefully
     return {
-      skillGaps: ["Could not analyze skill gaps due to an error."],
-      recommendedLearningPaths: ["Please check your input and try again."],
+      skillGaps: [],
+      recommendedLearningPaths: [],
       relatedSkills: [],
     };
   }

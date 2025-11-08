@@ -32,6 +32,8 @@ const FormSchema = z.object({
 
 export function Signup() {
   const [analysisResult, setAnalysisResult] = useState<AnalyzeSkillGapsOutput | null>(null)
+  const [learningPath, setLearningPath] = useState<string | null>(null)
+  const [enteredSkills, setEnteredSkills] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -41,11 +43,42 @@ export function Signup() {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     setIsSubmitting(true)
+    // Normalize skills -> array
+    const skillsArr = data.skills
+      .split(/[,\n]/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .slice(0, 15)
+    setEnteredSkills(skillsArr)
+
+    // 1) Analyze skill gaps (GenAI)
     const result = await analyzeSkillGaps({
       profileDescription: `Name: ${data.name}, College: ${data.college}, Skills: ${data.skills}`,
       desiredJob: data.goal,
     })
     setAnalysisResult(result)
+
+    // 2) Generate learning path via our API using entered skills & goal
+    try {
+      const res = await fetch('/api/ai/learning-path', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skills: skillsArr, goal: data.goal }),
+      })
+      if (res.ok) {
+        const plan = await res.json()
+        setLearningPath(plan?.learningPath || null)
+      } else {
+        throw new Error('plan_api_error')
+      }
+    } catch {
+      // Fallback: basic -> advanced template
+      const primary = (skillsArr[0] || 'Foundations').trim()
+      const g = data.goal.trim()
+      const fallback = `Week 1-2: ${primary} basics, syntax, and tooling\nWeek 3-4: Core concepts + small projects\nWeek 5-6: Intermediate topics related to ${g}\nWeek 7-8: Build 2 portfolio projects aligned with ${g}\nWeek 9-10: Advanced topics + performance + testing\nWeek 11-12: Polish portfolio, mock interviews, resume & LinkedIn`
+      setLearningPath(fallback)
+    }
+
     setIsSubmitting(false)
   }
 
@@ -103,7 +136,7 @@ export function Signup() {
         </div>
       </section>
 
-      <AlertDialog open={!!analysisResult} onOpenChange={() => setAnalysisResult(null)}>
+      <AlertDialog open={!!analysisResult} onOpenChange={() => { setAnalysisResult(null); setLearningPath(null); setEnteredSkills([]); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="font-headline">Your AI-Powered Skill Analysis</AlertDialogTitle>
@@ -124,6 +157,22 @@ export function Signup() {
             <ul className="list-disc list-inside space-y-1">
               {analysisResult?.relatedSkills.map((skill, i) => <li key={`skill-${i}`}>{skill}</li>)}
             </ul>
+            {enteredSkills.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-bold mb-2 text-primary">Your Entered Skills:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {enteredSkills.map((s, i) => (
+                    <span key={`es-${i}`} className="rounded-full bg-primary/10 px-2 py-1 text-xs text-primary border border-primary/20">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {learningPath && (
+              <div className="mt-6">
+                <h3 className="font-bold mb-2 text-primary">Your Recommended Learning Path:</h3>
+                <pre className="whitespace-pre-wrap bg-muted/40 rounded-md p-3 text-xs text-muted-foreground">{learningPath}</pre>
+              </div>
+            )}
           </div>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setAnalysisResult(null)}>Got it!</AlertDialogAction>

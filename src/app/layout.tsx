@@ -24,7 +24,6 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'SkillBridge AI',
   description: 'Bridge the Gap Between College and Career with AI',
-  icons: null,
 };
 
 export default function RootLayout({

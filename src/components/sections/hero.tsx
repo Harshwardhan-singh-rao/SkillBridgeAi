@@ -18,8 +18,9 @@ export function Hero() {
           <div className="flex flex-col justify-center space-y-4 text-left">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl !leading-tight">
               <Typewriter
-                text="Bridge the Gap Between College and Career with AI 🚀"
-                speed={20}
+                text="Bridge the Gap Between College and Career with Ai 🚀"
+                totalDurationMs={5000}
+                loopDelayMs={0}
               />
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">

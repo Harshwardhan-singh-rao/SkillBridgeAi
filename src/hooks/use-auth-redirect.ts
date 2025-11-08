@@ -9,8 +9,10 @@ export function useAuthRedirect(redirectPath = "/dashboard") {
   const router = useRouter()
 
   useEffect(() => {
-    if (!isUserLoading && user && !user.isAnonymous) {
-      router.push(redirectPath)
-    }
+    if (typeof window === 'undefined') return
+    if (isUserLoading) return
+    if (!user || user.isAnonymous) return
+    const current = window.location.pathname
+    if (current !== redirectPath) router.replace(redirectPath)
   }, [user, isUserLoading, router, redirectPath])
 }

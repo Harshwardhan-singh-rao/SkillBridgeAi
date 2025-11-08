@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -46,10 +47,12 @@ const loginSchema = z.object({
 });
 
 export default function AuthPage() {
-  useAuthRedirect();
   const auth = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams?.get('redirect') || '/dashboard';
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -67,6 +70,7 @@ export default function AuthPage() {
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({ title: 'Success', description: 'Logged in successfully!' });
+      router.replace(redirectTarget);
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -84,6 +88,7 @@ export default function AuthPage() {
     try {
       await createUserWithEmailAndPassword(auth, values.email, values.password);
       toast({ title: 'Success', description: 'Account created successfully!' });
+      router.replace(redirectTarget);
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -101,6 +106,7 @@ export default function AuthPage() {
     try {
       await signInWithPopup(auth, provider);
       toast({ title: 'Success', description: 'Logged in with Google!' });
+      router.replace(redirectTarget);
     } catch (error: any) {
       toast({
         variant: 'destructive',

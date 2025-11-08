@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -29,6 +29,19 @@ export function AiCareerCoach() {
     { role: "assistant", content: "Ask me anything! For example: 'What skills do I need for a Data Analyst role?'" }
   ])
 
+  // Inject external chatbot widget
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const existing = document.getElementById("omnidimension-web-widget") as HTMLScriptElement | null
+    if (!existing) {
+      const s = document.createElement('script')
+      s.id = 'omnidimension-web-widget'
+      s.async = true
+      s.src = 'https://backend.omnidim.io/web_widget.js?secret_key=f56a1292aa58b3de20b188aa85157d0e'
+      document.body.appendChild(s)
+    }
+  }, [])
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -41,12 +54,19 @@ export function AiCareerCoach() {
     form.reset()
     setMessages((prev) => [...prev, { role: "thinking", content: "..." }])
 
-    const result = await aiInteractiveCareerCoach({ query: data.query })
-
-    setMessages((prev) => {
-      const newMessages = prev.filter(msg => msg.role !== 'thinking')
-      return [...newMessages, { role: "assistant", content: result.answer }]
-    })
+    try {
+      const result = await aiInteractiveCareerCoach({ query: data.query })
+      setMessages((prev) => {
+        const newMessages = prev.filter(msg => msg.role !== 'thinking')
+        return [...newMessages, { role: "assistant", content: result.answer }]
+      })
+    } catch (e: any) {
+      const fallback = "AI is temporarily unavailable. Please try again in a moment."
+      setMessages((prev) => {
+        const newMessages = prev.filter(msg => msg.role !== 'thinking')
+        return [...newMessages, { role: "assistant", content: fallback }]
+      })
+    }
   }
 
   return (

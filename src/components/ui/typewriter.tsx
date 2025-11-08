@@ -7,12 +7,16 @@ interface TypewriterProps extends React.HTMLAttributes<HTMLSpanElement> {
   text: string
   speed?: number
   delay?: number
+  loopDelayMs?: number
+  totalDurationMs?: number
 }
 
 export function Typewriter({
   text,
   speed = 50,
   delay = 0,
+  loopDelayMs = 0,
+  totalDurationMs,
   className,
   ...props
 }: TypewriterProps) {
@@ -30,18 +34,35 @@ export function Typewriter({
   useEffect(() => {
     if (!isStarted) return
 
-    let i = 0
-    const interval = setInterval(() => {
-      if (i < text.length) {
-        setDisplayedText((prev) => prev + text.charAt(i))
-        i++
-      } else {
-        clearInterval(interval)
-      }
-    }, speed)
+    let interval: NodeJS.Timeout | null = null
+    let timeout: NodeJS.Timeout | null = null
 
-    return () => clearInterval(interval)
-  }, [isStarted, text, speed])
+    const perCharDelay = totalDurationMs && text.length > 0 ? Math.max(1, Math.floor(totalDurationMs / text.length)) : speed
+
+    const startTyping = () => {
+      let i = 0
+      interval = setInterval(() => {
+        if (i < text.length) {
+          setDisplayedText((prev) => prev + text.charAt(i))
+          i++
+        } else {
+          if (interval) clearInterval(interval)
+          timeout = setTimeout(() => {
+            setDisplayedText("")
+            startTyping()
+          }, loopDelayMs)
+        }
+      }, perCharDelay)
+    }
+
+    // initial delay already handled by isStarted
+    startTyping()
+
+    return () => {
+      if (interval) clearInterval(interval)
+      if (timeout) clearTimeout(timeout)
+    }
+  }, [isStarted, text, speed, loopDelayMs, totalDurationMs])
 
   return (
     <span className={cn(className)} {...props}>
