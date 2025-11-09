@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
-import { AIService } from '@/ai/server/aiService';
+import { skillGap } from '@/ai/server/aiService';
 import { fetchUserProfile, matchMentors } from '@/ai/server/data';
 import { logAIResponse } from '@/ai/server/logger';
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error }, { status: 400 });
     }
 
-    const data = await AIService.skillGap({ skills, goal });
+    const data = await skillGap({ skills, goal });
     const mentors = await matchMentors(data.missingSkills ?? [], 5);
     const response = { ...data, mentors };
     await logAIResponse({ route: 'skillgap', userId: userId ?? null, ip, request: { skills, goal }, response });

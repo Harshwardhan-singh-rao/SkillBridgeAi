@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -29,18 +29,6 @@ export function AiCareerCoach() {
     { role: "assistant", content: "Ask me anything! For example: 'What skills do I need for a Data Analyst role?'" }
   ])
 
-  // Inject external chatbot widget
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const existing = document.getElementById("omnidimension-web-widget") as HTMLScriptElement | null
-    if (!existing) {
-      const s = document.createElement('script')
-      s.id = 'omnidimension-web-widget'
-      s.async = true
-      s.src = 'https://backend.omnidim.io/web_widget.js?secret_key=f56a1292aa58b3de20b188aa85157d0e'
-      document.body.appendChild(s)
-    }
-  }, [])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -113,7 +101,19 @@ export function AiCareerCoach() {
                     render={({ field }) => (
                       <FormItem className="flex-grow">
                         <FormControl>
-                          <Textarea placeholder="Ask your question..." {...field} />
+                          <Textarea
+                            id="ai-query"
+                            placeholder="Ask your question..."
+                            {...field}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                if (!form.formState.isSubmitting) {
+                                  form.handleSubmit(onSubmit)();
+                                }
+                              }
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -124,6 +124,22 @@ export function AiCareerCoach() {
               </Form>
             </div>
           </Card>
+          {/* Floating chat helper button */}
+          <div
+            id="chat-helper-button"
+            onClick={() => {
+              const el = document.getElementById('ai-query') as HTMLTextAreaElement | null;
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => el.focus(), 300);
+              }
+            }}
+            className="fixed bottom-6 right-6 z-50 flex items-center px-4 py-3 rounded-full cursor-pointer shadow-lg transition-transform hover:scale-105"
+            style={{ backgroundColor: 'rgb(20, 39, 68)', color: 'rgb(177, 251, 248)' }}
+          >
+            <img src="https://www.omnidim.io/logo.png" alt="Chat" className="h-6 w-6 mr-2" />
+            <span className="font-bold">Your AI Career Coach 🤖</span>
+          </div>
         </div>
       </div>
     </section>

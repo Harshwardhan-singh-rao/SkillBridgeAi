@@ -111,5 +111,31 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if false;
     }
+
+    /**
+     * @description Enforces user-ownership for ResumeRadar analysis versions.
+     *              Only the user can read and write their own resume analysis results.
+     * @path /users/{userId}/resumeRadarVersions/{versionId}
+     * @allow (create) User with ID 'user123' creates a resume analysis version.
+     * @allow (get, list, update, delete) User with ID 'user123' reads/updates/deletes their own versions.
+     * @deny User with ID 'user456' tries to access versions of 'user123'.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId}/resumeRadarVersions/{versionId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
   }
 }

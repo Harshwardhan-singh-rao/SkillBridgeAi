@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
-import { AIService } from '@/ai/server/aiService';
+import { learningPath, skillGap } from '@/ai/server/aiService';
 import { fetchUserProfile, matchMentors } from '@/ai/server/data';
 import { logAIResponse } from '@/ai/server/logger';
 
@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate plan
-    const plan = await AIService.learningPath({ skills, goal });
+    const plan = await learningPath({ skills, goal });
     // Compute missing skills to recommend mentors
-    const gap = await AIService.skillGap({ skills, goal });
+    const gap = await skillGap({ skills, goal });
     const mentors = await matchMentors(gap.missingSkills ?? [], 5);
     const response = { ...plan, missingSkills: gap.missingSkills, mentors };
     await logAIResponse({ route: 'learning-path', userId: userId ?? null, ip, request: { skills, goal }, response });

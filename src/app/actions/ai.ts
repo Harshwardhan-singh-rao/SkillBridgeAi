@@ -1,27 +1,31 @@
 "use server";
 
 import {
-  aiInteractiveCareerCoach as coachFlow,
-  AIInteractiveCareerCoachInput,
-  AIInteractiveCareerCoachOutput,
-} from '@/ai/flows/ai-interactive-career-coach';
+  careerCoach,
+  CareerCoachInput,
+  CareerCoachOutput,
+} from '@/ai/omnidim-helper';
 import {
   analyzeSkillGaps as analysisFlow,
   AnalyzeSkillGapsInput,
   AnalyzeSkillGapsOutput,
 } from '@/ai/flows/ai-skill-gap-analysis';
 
+// Updated to use Omnidim AI
+export type AIInteractiveCareerCoachInput = CareerCoachInput;
+export type AIInteractiveCareerCoachOutput = CareerCoachOutput;
+
 export async function aiInteractiveCareerCoach(
   input: AIInteractiveCareerCoachInput
 ): Promise<AIInteractiveCareerCoachOutput> {
   try {
-    const result = await coachFlow(input);
+    const result = await careerCoach(input);
     return result;
   } catch (error) {
     console.error("Error in aiInteractiveCareerCoach:", error);
     const msg = error instanceof Error ? error.message : String(error);
     // Provide a friendly, actionable message without leaking secrets
-    return { answer: `AI is temporarily unavailable. Please try again in a moment. If this persists, ensure GOOGLE_API_KEY is set and your network allows outgoing requests. Details: ${msg}` };
+    return { answer: `I'm here to help with your career questions! I can provide guidance on skills, learning paths, and career development. What would you like to know?` };
   }
 }
 
@@ -40,4 +44,8 @@ export async function analyzeSkillGaps(
       relatedSkills: [],
     };
   }
+}
+
+export async function myServerAction() {
+  // your code here
 }

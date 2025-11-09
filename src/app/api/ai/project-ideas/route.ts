@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
-import { AIService } from '@/ai/server/aiService';
+import { projectIdeas } from '@/ai/server/aiService';
 import { logAIResponse } from '@/ai/server/logger';
 
 export async function GET(req: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const domain = searchParams.get('domain') || undefined;
     const level = (searchParams.get('level') as any) || undefined;
     const userId = searchParams.get('userId') || undefined;
-    const data = await AIService.projectIdeas({ domain, level });
+    const data = await projectIdeas({ domain, level });
     await logAIResponse({ route: 'project-ideas', userId: userId ?? null, ip, request: { domain, level }, response: data });
     return NextResponse.json(data);
   } catch (e: any) {

@@ -79,22 +79,40 @@ export function PlacementCourse() {
                       <div className="mt-2 text-lg font-semibold">Payment Successful</div>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      <Input placeholder="Card Number" value={card.number} onChange={e => setCard(v => ({ ...v, number: e.target.value }))} />
+                    <form
+                      className="space-y-4"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!submitting) onCheckout();
+                      }}
+                    >
+                      <Input
+                        placeholder="Card Number"
+                        value={card.number}
+                        onChange={e => setCard(v => ({ ...v, number: e.target.value }))}
+                      />
                       <div className="grid grid-cols-2 gap-3">
-                        <Input placeholder="MM/YY" value={card.expiry} onChange={e => setCard(v => ({ ...v, expiry: e.target.value }))} />
-                        <Input placeholder="CVV" value={card.cvv} onChange={e => setCard(v => ({ ...v, cvv: e.target.value }))} />
+                        <Input
+                          placeholder="MM/YY"
+                          value={card.expiry}
+                          onChange={e => setCard(v => ({ ...v, expiry: e.target.value }))}
+                        />
+                        <Input
+                          placeholder="CVV"
+                          value={card.cvv}
+                          onChange={e => setCard(v => ({ ...v, cvv: e.target.value }))}
+                        />
                       </div>
                       {error && (
                         <div className="text-sm text-red-500">{error}</div>
                       )}
                       <div className="flex justify-end gap-2 pt-2">
                         <Dialog.Close asChild>
-                          <Button variant="ghost">Cancel</Button>
+                          <Button variant="ghost" type="button">Cancel</Button>
                         </Dialog.Close>
-                        <Button onClick={onCheckout} disabled={submitting}>{submitting ? "Processing..." : "Pay ₹4,999"}</Button>
+                        <Button type="submit" disabled={submitting}>{submitting ? "Processing..." : "Pay ₹4,999"}</Button>
                       </div>
-                    </div>
+                    </form>
                   )}
                 </Dialog.Content>
               </Dialog.Portal>
