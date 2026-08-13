@@ -60,6 +60,8 @@ function useMockMentors(total = 20000) {
   [total]);
 }
 
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+
 export default function MentorsPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
@@ -94,36 +96,38 @@ export default function MentorsPage() {
   }
 
   return (
-    <section className="container mx-auto px-4 md:px-6 py-10">
-      <h1 className="font-headline text-3xl md:text-4xl mb-2">All Mentors</h1>
-      <p className="text-sm text-muted-foreground mb-6">20,000+ mentors available. Page {page} of {totalPages}.</p>
+    <DashboardLayout>
+      <section className="container mx-auto px-4 md:px-6 py-10">
+        <h1 className="font-headline text-3xl md:text-4xl mb-2">All Mentors</h1>
+        <p className="text-sm text-muted-foreground mb-6">20,000+ mentors available. Page {page} of {totalPages}.</p>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {slice.map((m) => (
-          <Card key={m.id} className={`glass-card ${requested[m.id] ? 'border-green-500/60 shadow-green-500/20 ring-1 ring-green-500/30' : ''}`}>
-            <CardContent className="p-4">
-              <div className="font-semibold text-lg">{m.name}</div>
-              <div className="text-sm text-muted-foreground">{m.title} at <span className="font-medium">{m.company}</span></div>
-              <div className="mt-4">
-                <div className="flex items-center gap-2">
-                  {requested[m.id] && (
-                    <Badge className="bg-green-600 text-white">Request sent</Badge>
-                  )}
-                  <Button size="sm" onClick={() => requestConnection(m.id)} disabled={!!requested[m.id]}>
-                    {requested[m.id] ? "Requested" : "Connect"}
-                  </Button>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {slice.map((m) => (
+            <Card key={m.id} className={`glass-card ${requested[m.id] ? 'border-green-500/60 shadow-green-500/20 ring-1 ring-green-500/30' : ''}`}>
+              <CardContent className="p-4">
+                <div className="font-semibold text-lg">{m.name}</div>
+                <div className="text-sm text-muted-foreground">{m.title} at <span className="font-medium">{m.company}</span></div>
+                <div className="mt-4">
+                  <div className="flex items-center gap-2">
+                    {requested[m.id] && (
+                      <Badge className="bg-green-600 text-white">Request sent</Badge>
+                    )}
+                    <Button size="sm" onClick={() => requestConnection(m.id)} disabled={!!requested[m.id]}>
+                      {requested[m.id] ? "Requested" : "Connect"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-      <div className="flex items-center justify-between mt-6">
-        <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
-        <div className="text-sm">Page {page} / {totalPages}</div>
-        <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
-      </div>
-    </section>
+        <div className="flex items-center justify-between mt-6">
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
+          <div className="text-sm">Page {page} / {totalPages}</div>
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
+        </div>
+      </section>
+    </DashboardLayout>
   );
 }

@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { PT_Sans, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/layout/theme-provider';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
+import { AppShell } from '@/components/layout/app-shell';
 import { Toaster } from '@/components/ui/toaster';
 import { ScrollToTop } from '@/components/ui/scroll-to-top';
 import CursorGlow from '@/components/ui/cursor-glow';
@@ -37,9 +36,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <FirebaseClientProvider>
             <CursorGlow />
-            <Header />
-            <main className="pt-16">{children}</main>
-            <Footer />
+            <AppShell>{children}</AppShell>
             <Toaster />
             <ScrollToTop />
           </FirebaseClientProvider>

@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 // Firebase imports removed for simplified version - can be re-added later
-// import { DashboardLayout } from '@/components/dashboard/DashboardLayout'; // Temporarily disabled
+import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 
 interface AnalysisResult {
   keywordMatch: number;
@@ -185,193 +185,195 @@ export default function ResumeRadarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Navigation */}
-        <div className="mb-6">
-          <Link href="/dashboard" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </div>
-        
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            ResumeRadar
-          </h1>
-          <p className="text-xl text-gray-600">
-            Real-Time Resume Analyzer powered by AI
-          </p>
-        </div>
+    <DashboardLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+        <div className="max-w-6xl mx-auto">
+          {/* Navigation */}
+          <div className="mb-6">
+            <Link href="/dashboard" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Link>
+          </div>
+          
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+              ResumeRadar
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Real-Time Resume Analyzer powered by AI
+            </p>
+          </div>
 
-        {/* Upload Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Card className="border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5" />
-                Upload Resume
-              </CardTitle>
-              <CardDescription>
-                Upload your resume in PDF or TXT format
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <input
-                  type="file"
-                  accept=".pdf,.txt"
-                  onChange={handleFileUpload}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-                {resumeFile && (
-                  <div className="flex items-center gap-2 text-sm text-green-600">
-                    <FileText className="h-4 w-4" />
-                    {resumeFile.name}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Job Description</CardTitle>
-              <CardDescription>
-                Paste the job description you're targeting
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="Paste the job description here..."
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                className="min-h-[120px] resize-none"
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Analyze Button */}
-        <div className="text-center mb-8">
-          <Button
-            onClick={analyzeResume}
-            disabled={!resumeFile || !jobDescription.trim() || isAnalyzing}
-            size="lg"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
-          >
-            {isAnalyzing ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Analyzing your resume...
-              </>
-            ) : (
-              <>
-                <Zap className="h-5 w-5 mr-2" />
-                Analyze Resume
-              </>
-            )}
-          </Button>
-        </div>
-
-        {/* Results Section */}
-        {analysisResult && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">Analysis Results</h2>
-              <Button onClick={saveVersion} variant="outline">
-                <Save className="h-4 w-4 mr-2" />
-                Save Version
-              </Button>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Keyword Match Score */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    Keyword Match Score
-                    <span className={`text-2xl font-bold ${getScoreColor(analysisResult.keywordMatch)}`}>
-                      {analysisResult.keywordMatch}%
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <Progress 
-                      value={analysisResult.keywordMatch} 
-                      className="h-3"
-                    />
-                    <p className="text-sm text-gray-600">
-                      Percentage of job keywords found in your resume
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* ATS Compatibility Score */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    ATS Compatibility Score
-                    <span className={`text-2xl font-bold ${getScoreColor(analysisResult.atsScore)}`}>
-                      {analysisResult.atsScore}%
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <Progress 
-                      value={analysisResult.atsScore} 
-                      className="h-3"
-                    />
-                    <p className="text-sm text-gray-600">
-                      Based on structure and clarity for ATS systems
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Rewritten Bullet Points */}
-            <Card>
+          {/* Upload Section */}
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <Card className="border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors">
               <CardHeader>
-                <CardTitle>Enhanced Bullet Points</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  Upload Resume
+                </CardTitle>
                 <CardDescription>
-                  AI-improved versions of your resume bullet points
+                  Upload your resume in PDF or TXT format
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {analysisResult.rewrittenBullets.map((bullet, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-800">{bullet}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyBulletPoint(bullet, index)}
-                        className="shrink-0"
-                      >
-                        {copiedBullets.has(index) ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
+                <div className="space-y-4">
+                  <input
+                    type="file"
+                    accept=".pdf,.txt"
+                    onChange={handleFileUpload}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  {resumeFile && (
+                    <div className="flex items-center gap-2 text-sm text-green-600">
+                      <FileText className="h-4 w-4" />
+                      {resumeFile.name}
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Job Description</CardTitle>
+                <CardDescription>
+                  Paste the job description you're targeting
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="Paste the job description here..."
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  className="min-h-[120px] resize-none"
+                />
+              </CardContent>
+            </Card>
           </div>
-        )}
+
+          {/* Analyze Button */}
+          <div className="text-center mb-8">
+            <Button
+              onClick={analyzeResume}
+              disabled={!resumeFile || !jobDescription.trim() || isAnalyzing}
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
+            >
+              {isAnalyzing ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Analyzing your resume...
+                </>
+              ) : (
+                <>
+                  <Zap className="h-5 w-5 mr-2" />
+                  Analyze Resume
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Results Section */}
+          {analysisResult && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analysis Results</h2>
+                <Button onClick={saveVersion} variant="outline">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Version
+                </Button>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Keyword Match Score */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      Keyword Match Score
+                      <span className={`text-2xl font-bold ${getScoreColor(analysisResult.keywordMatch)}`}>
+                        {analysisResult.keywordMatch}%
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <Progress 
+                        value={analysisResult.keywordMatch} 
+                        className="h-3"
+                      />
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Percentage of job keywords found in your resume
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* ATS Compatibility Score */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      ATS Compatibility Score
+                      <span className={`text-2xl font-bold ${getScoreColor(analysisResult.atsScore)}`}>
+                        {analysisResult.atsScore}%
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <Progress 
+                        value={analysisResult.atsScore} 
+                        className="h-3"
+                      />
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Based on structure and clarity for ATS systems
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Rewritten Bullet Points */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Enhanced Bullet Points</CardTitle>
+                  <CardDescription>
+                    AI-improved versions of your resume bullet points
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {analysisResult.rewrittenBullets.map((bullet, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-800 dark:text-gray-200">{bullet}</p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => copyBulletPoint(bullet, index)}
+                          className="shrink-0"
+                        >
+                          {copiedBullets.has(index) ? (
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
